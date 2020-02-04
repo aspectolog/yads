@@ -72,9 +72,9 @@ def direct_api_request(req, uri, params={}):
             return res
             if res.get('limitedBy', False):
                 print("Получены не все доступные объекты.")
-                '''Если ответ содержит параметр LimitedBy, значит,были получены не все доступные объекты.
+                """Если ответ содержит параметр LimitedBy, значит,были получены не все доступные объекты.
                 В этом случае следует выполнить дополнительные запросы для получения всех объектов. Не реализовано в данной версии.
-                Подробное описание постраничной выборки https://tech.yandex.ru/direct/doc/dg/best-practice/get-docpage/#page'''
+                Подробное описание постраничной выборки https://tech.yandex.ru/direct/doc/dg/best-practice/get-docpage/#page"""
 
     # Обработка ошибки, если не удалось соединиться с сервером API Директа
     except ConnectionError:
@@ -121,8 +121,8 @@ def convert(x, a, b): # экстраполируем x из а[] в b[]
     return(b[0])
 
 
-'''----------------------------------------------------------------------------------------------------------------'''
-'''----------------------------------------------------------------------------------------------------------------'''
+"""----------------------------------------------------------------------------------------------------------------"""
+"""----------------------------------------------------------------------------------------------------------------"""
 
 if __name__ == "__main__":
     print("________________________")
@@ -140,27 +140,26 @@ if __name__ == "__main__":
     data = get_bids(campaignId)
     bids_list = []
     new_bids_list = []
-    """Для каждого Ключевого слова из data"""
+    # Для каждого Ключевого слова из data
     for keywordId in data:
         bids_list.append(data.get(keywordId)["Bid"])
         AuctionBidItems = data.get(keywordId)["AuctionBids"]["AuctionBidItems"]
         volume_list = [] # Обнуляем список доступных объемов, т.к. у разных ключевиков он почему-то отличается.
         bids_list = []
         prices_list = []
-        # TODO: Найти более простой способ вычислить ставки
-        """ Перебор таблицы ставок для ключевого слова """
+        # Перебор таблицы ставок для ключевого слова
         for i in range(0, len(AuctionBidItems)-1):
             volume_list.append(AuctionBidItems[i]["TrafficVolume"])
             bids_list.append(AuctionBidItems[i]["Bid"])
             prices_list.append(AuctionBidItems[i]["Price"])
-        """ Экстраполируем целевую ставку, из объема в соответств. цену """
+        # Преобразовываем объем трафика в цену
         new_bid = convert(target_volume, volume_list, bids_list)
-        """сравниваем с максимальной"""
+        # Сравниваем с максимальной
         if new_bid > MAX_BID * 1000000:
             new_bid = MAX_BID * 1000000
 
         new_bids_list.append({"KeywordId": keywordId, "SearchBid": new_bid})  # Добавляем в Список словари
-    if not new_bids_list is []: # Если колдунство удалось
+    if new_bids_list != []: # Если колдунство удалось
         set_search_bids_by_volume(new_bids_list)
     else:
         print("Что-то пошло не так. Список новых ставок пуст.")
